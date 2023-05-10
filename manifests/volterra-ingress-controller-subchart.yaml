@@ -1,0 +1,22 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: volterra-ingress-controller
+  namespace: modern-dane
+spec:
+  project: default
+  source:
+    path: charts/volterra-ingress-controller
+    repoURL: https://github.com/aknot242/techxchange-gitops-lab.git
+    targetRevision: HEAD
+  destination:
+    namespace: volt-ic
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

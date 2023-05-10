@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: brewz-xc-ingress
+  annotations:
+    # Load Balancer annotations
+    ingress.cloud.f5.com/max-request-header-size: "90"
+    ingress.cloud.f5.com/lb-method: random
+    ingress.cloud.f5.com/max-fails: "5"
+    ingress.cloud.f5.com/connection-timeout: "4000"
+    ingress.cloud.f5.com/https-auto-cert: "false"   #TLS termination with auto cert
+    ingress.cloud.f5.com/http-redirect: "true"     #Enable HTTP to HTTPs redirect
+    ingress.cloud.f5.com/public-ip-address: 72.19.3.73 # Tenant Static IP Address
+
+    # Load Balancer Route annotations
+    ingress.cloud.f5.com/disable-host-rewrite: "nic-nginx-ingress-controller"
+
+    # Origin Pool annotations
+    ingress.cloud.f5.com/ssl-services: "nic-nginx-ingress-controller"
+
+spec:
+  tls:
+    - hosts:
+      - brewz-modern-dane.labs.f5demos.com
+      secretName: xc-lb-lab-tls-secret
+  rules:
+    - host: brewz-modern-dane.labs.f5demos.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nic-nginx-ingress-controller
+                port:
+                  number: 443
